@@ -30,12 +30,13 @@
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "jest"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
+    "@types/jest": "^30.0.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.19.28",
     "@types/vscode": "^1.96.0",
@@ -44,8 +45,12 @@
     "@vscode/test-electron": "^2.3.2",
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "mocha": "^10.2.0",
+    "ts-jest": "^29.4.6",
     "ts-loader": "^9.4.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.1.3",
     "webpack": "^5.85.0",
     "webpack-cli": "^5.1.1"
