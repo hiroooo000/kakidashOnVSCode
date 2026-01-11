@@ -9,7 +9,7 @@
   "activationEvents": [
     "onCustomEditor:kakidash.mindmap"
   ],
-  "main": "./out/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "customEditors": [
       {
@@ -25,8 +25,8 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "compile": "tsc -p .",
-    "watch": "tsc -w -p .",
+    "compile": "webpack",
+    "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
@@ -51,6 +51,6 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
-    "kakidash": "^0.0.1"
+    "kakidash": "^0.0.2"
   }
 }

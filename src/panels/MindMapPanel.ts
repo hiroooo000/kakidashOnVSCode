@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { getNonce } from './getNonce';
 
 export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
@@ -46,9 +47,15 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
     }
 
     private getHtmlForWebview(webview: vscode.Webview, document: vscode.TextDocument): string {
-        const scriptUri = webview.asWebviewUri(vscode.Uri.joinPath(this.context.extensionUri, 'node_modules', 'kakidash', 'dist', 'kakidash.umd.js'));
+        // Local path to main script run in the webview
+        const scriptPathOnDisk = vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview.js');
+        const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
 
-        const text = document.getText();
+        // Initial content
+        const textStr = document.getText();
+
+        // Use a nonce to whitelist which scripts can be run
+        const nonce = getNonce();
 
         return `
             <!DOCTYPE html>
@@ -61,62 +68,13 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                     body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: white; }
                     #mindmap-container { width: 100%; height: 100%; }
                 </style>
-                <script src="${scriptUri}"></script>
             </head>
             <body>
                 <div id="mindmap-container"></div>
-                <script>
-                    const vscode = acquireVsCodeApi();
-                    
-                    const container = document.getElementById('mindmap-container');
-                    let board;
-
-                    // Parse content safely
-                    let initialContent = null;
-                    try {
-                        const rawText = ${JSON.stringify(text)};
-                        if (rawText.trim()) {
-                            initialContent = JSON.parse(rawText);
-                        }
-                    } catch (e) {
-                        console.error('Failed to parse initial content', e);
-                        // Maybe initialize empty or show error? 
-                        // For now we pass null or empty object if library supports it, or let it handle it.
-                    }
-
-                    if (window.kakidash) {
-                        const { Kakidash } = window.kakidash;
-                        board = new Kakidash(container);
-                        
-                        if (initialContent) {
-                            board.loadData(initialContent);
-                        } else {
-                            // Initialize with a root node if empty
-                            // board.addNode(board.getRootId(), 'Root'); // If library supports this or has default
-                            // Docs say: board.addNode(board.getRootId(), 'Hello World');
-                            // But we need to know what getRootId() returns for a fresh board.
-                            // Assuming empty board might need some init.
-                            // Let's rely on loadData or user interaction for now.
-                        }
-                    } else {
-                        container.innerText = 'Kakidash library (window.kakidash) not found.';
-                    }
-
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        switch (message.type) {
-                            case 'update':
-                                try {
-                                    const data = JSON.parse(message.text);
-                                    if (board) {
-                                        board.loadData(data);
-                                    }
-                                } catch (e) {
-                                    console.error('Failed to parse update', e);
-                                }
-                                return;
-                        }
-                    });
+                <script nonce="${nonce}" src="${scriptUri}"></script>
+                <script nonce="${nonce}">
+                    // Initialize with data
+                    window.postMessage({ type: 'update', text: ${JSON.stringify(textStr)} }, '*');
                 </script>
             </body>
         `;
