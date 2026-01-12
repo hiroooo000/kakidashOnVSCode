@@ -96,11 +96,11 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                 <title>Kakidash Mindmap</title>
                 <style>
                     body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: white; }
-                    #mindmap-container { width: 100%; height: 100%; }
+                    #mindmap-container { width: 100%; height: 100%; outline: none; }
                 </style>
             </head>
             <body>
-                <div id="mindmap-container"></div>
+                <div id="mindmap-container" tabindex="-1"></div>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     // Initialize with data

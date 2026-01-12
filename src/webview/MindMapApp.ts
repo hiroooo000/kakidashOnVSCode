@@ -3,6 +3,7 @@ import { Kakidash, MindMapData } from 'kakidash';
 export class MindMapApp {
     private board: Kakidash | undefined;
     private isSyncing = false;
+    private selectedNodeId: string | null = null;
 
     constructor(private container: HTMLElement, private onChange?: (text: string) => void) {
         if (!container) {
@@ -20,7 +21,34 @@ export class MindMapApp {
                     this.onChange(JSON.stringify(data, null, 2));
                 }
             });
+
+            // Track selection
+            this.board.on('node:select', (id: string | null) => {
+                this.selectedNodeId = id;
+            });
         }
+
+        // Ensure container can be focused
+        this.container.focus();
+
+        // Re-focus when window gets focus (e.g. switching tabs back)
+        window.addEventListener('focus', () => {
+            this.container.focus();
+        });
+
+        // Listen for keydown to handle initial focus when nothing is selected
+        window.addEventListener('keydown', (e) => {
+            if (!this.board) { return; }
+            if (this.selectedNodeId) { return; }
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'h', 'j', 'k', 'l'].includes(e.key)) {
+                e.preventDefault();
+                const root = this.board.getRoot();
+                if (root) {
+                    this.board.selectNode(root.id);
+                }
+            }
+        });
     }
 
     /**
@@ -82,6 +110,11 @@ export class MindMapApp {
         } finally {
             this.isSyncing = false;
         }
+
+        // Ensure focus after loading new data
+        setTimeout(() => {
+            this.container.focus();
+        }, 0);
     }
 
     public getBoard(): Kakidash | undefined {
