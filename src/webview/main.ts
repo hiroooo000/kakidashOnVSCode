@@ -11,7 +11,12 @@ const vscode = acquireVsCodeApi();
 const container = document.getElementById('mindmap-container');
 
 if (container) {
-    const app = new MindMapApp(container);
+    const app = new MindMapApp(container, (text: string) => {
+        vscode.postMessage({
+            type: 'change',
+            text: text
+        });
+    });
 
     // Handle messages from the extension
     window.addEventListener('message', event => {
@@ -22,6 +27,9 @@ if (container) {
                 return;
         }
     });
+
+    // Notify the extension that we are ready to receive data
+    vscode.postMessage({ type: 'client:ready' });
 } else {
     console.error('MindMap container not found');
 }

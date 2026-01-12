@@ -31,19 +31,49 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
         webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
 
+        let isFromWebview = false;
+
         // Listen for changes to the document (though we are focused on read-only for now or initial load)
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
             if (e.document.uri.toString() === document.uri.toString()) {
-                webviewPanel.webview.postMessage({
-                    type: 'update',
-                    text: document.getText(),
-                });
+                if (isFromWebview) {
+                    return;
+                }
+                this.updateWebview(webviewPanel.webview, document.getText());
             }
         });
 
         webviewPanel.onDidDispose(() => {
             changeDocumentSubscription.dispose();
         });
+
+        webviewPanel.webview.onDidReceiveMessage(async e => {
+            switch (e.type) {
+                case 'client:ready':
+                    this.updateWebview(webviewPanel.webview, document.getText());
+                    return;
+                case 'change':
+                    isFromWebview = true;
+                    try {
+                        await this.updateTextDocument(document, e.text);
+                    } finally {
+                        isFromWebview = false;
+                    }
+                    return;
+            }
+        });
+    }
+
+    private updateTextDocument(document: vscode.TextDocument, text: string) {
+        const edit = new vscode.WorkspaceEdit();
+
+        // Calculate full range
+        const firstLine = document.lineAt(0);
+        const lastLine = document.lineAt(document.lineCount - 1);
+        const range = new vscode.Range(firstLine.range.start, lastLine.range.end);
+
+        edit.replace(document.uri, range, text);
+        return vscode.workspace.applyEdit(edit);
     }
 
     private getHtmlForWebview(webview: vscode.Webview, document: vscode.TextDocument): string {
@@ -78,5 +108,12 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                 </script>
             </body>
         `;
+    }
+
+    private updateWebview(webview: vscode.Webview, text: string) {
+        webview.postMessage({
+            type: 'update',
+            text: text,
+        });
     }
 }
