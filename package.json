@@ -1,10 +1,12 @@
 {
   "name": "kakidash-vscode",
   "displayName": "Kakidash Mindmap",
+  "publisher": "hiroooo000",
+  "repository": "https://github.com/hiroooo000/kakidashOnVSCode.git",
   "description": "VSCode extension to view mindmaps using kakidash",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.96.0"
   },
   "activationEvents": [
     "onCustomEditor:kakidash.mindmap"
