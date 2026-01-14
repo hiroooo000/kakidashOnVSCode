@@ -1,10 +1,22 @@
 {
-  "name": "kakidash-vscode",
-  "displayName": "Kakidash Mindmap",
+  "name": "kakidash-on-vscode",
+  "displayName": "Mindmap vscode extension powered by kakidash",
+  "icon": "icon.png",
+  "publisher": "hiroooo000",
+  "repository": "https://github.com/hiroooo000/kakidashOnVSCode.git",
   "description": "VSCode extension to view mindmaps using kakidash",
+  "keywords": [
+    "mindmap",
+    "kakidash",
+    "visualization",
+    "diagram",
+    "productivity",
+    "brainstorming",
+    "idea"
+  ],
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.96.0"
   },
   "activationEvents": [
     "onCustomEditor:kakidash.mindmap"
@@ -56,6 +68,6 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
-    "kakidash": "^0.0.3"
+    "kakidash": "^0.0.4"
   }
 }
