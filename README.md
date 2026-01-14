@@ -15,7 +15,7 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 | --- | --- |
 | `Arrow Keys` | Navigate between nodes |
 | `h` / `j` / `k` / `l` | Navigate between nodes (Vim-style) |
-| `F2` / `DblClick` | Start editing node |
+| `F2` / `DblClick` / `Space` | Start editing node (Space triggers zoom if image) |
 | `Enter` | Add sibling node (below) |
 | `Shift + Enter` | Add sibling node (above) |
 | `Tab` | Add child node |
@@ -25,7 +25,6 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 | `Ctrl/Cmd + C` | Copy |
 | `Ctrl/Cmd + X` | Cut |
 | `Ctrl/Cmd + V` | Paste (Images supported) |
-| `Space` | Toggle enlarge image (Image Node) |
 | `Drag` (Canvas) | Pan screen |
 | `Wheel` | Vertical scroll (Pan) |
 | `Shift + Wheel` | Horizontal scroll (Pan) |
@@ -41,8 +40,8 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 ### Styling (Since selection)
 | Key | Description |
 | --- | --- |
-| `Ctrl/Cmd + B` | Toggle Bold |
-| `Ctrl/Cmd + I` | Toggle Italic |
+| `b` | Toggle Bold |
+| `i` | Toggle Italic |
 | `+` | Increase font size |
 | `-` | Decrease font size |
 | `1` - `7` | Change node color (Palette order) |
