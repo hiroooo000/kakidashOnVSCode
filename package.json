@@ -1,6 +1,7 @@
 {
   "name": "kakidash-vscode",
   "displayName": "Kakidash Mindmap",
+  "icon": "icon.png",
   "publisher": "hiroooo000",
   "repository": "https://github.com/hiroooo000/kakidashOnVSCode.git",
   "description": "VSCode extension to view mindmaps using kakidash",
