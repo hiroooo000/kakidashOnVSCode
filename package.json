@@ -18,9 +18,6 @@
   "engines": {
     "vscode": "^1.96.0"
   },
-  "activationEvents": [
-    "onCustomEditor:kakidash.mindmap"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "customEditors": [
