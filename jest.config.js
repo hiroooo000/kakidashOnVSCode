@@ -2,7 +2,7 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'jsdom',
     moduleNameMapper: {
-        '^kakidash$': '<rootDir>/node_modules/kakidash/dist/kakidash.umd.js'
+        '^kakidash$': '<rootDir>/node_modules/kakidash/dist/kakidash.cjs'
     },
     transform: {
         '^.+\\.ts$': ['ts-jest', {
