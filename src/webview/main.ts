@@ -25,6 +25,11 @@ if (container) {
             case 'update':
                 app.loadData(message.text);
                 return;
+            case 'settings':
+                if (message.nodeWidth !== undefined) {
+                    app.setNodeWidth(message.nodeWidth);
+                }
+                return;
         }
     });
 

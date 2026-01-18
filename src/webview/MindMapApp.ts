@@ -120,4 +120,14 @@ export class MindMapApp {
     public getBoard(): Kakidash | undefined {
         return this.board;
     }
+
+    public setNodeWidth(width: number): void {
+        try {
+            if (this.board) {
+                this.board.setMaxNodeWidth(width);
+            }
+        } catch (e) {
+            console.error('Failed to set node width:', e);
+        }
+    }
 }
