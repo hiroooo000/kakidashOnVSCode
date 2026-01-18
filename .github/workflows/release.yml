@@ -2,34 +2,74 @@ name: Release
 
 on:
   push:
-    tags:
-      - 'v*'
-
-permissions:
-  contents: write
+    branches:
+      - main
+    paths:
+      - 'package.json'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
+      id-token: write
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Use Node.js 20.x
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        cache: 'npm'
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build and Package VSIX
-      run: npx @vscode/vsce package --no-yarn
+      - name: Run Check
+        run: |
+          npm run lint
+          npm run compile
+          npm run test
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v1
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: '*.vsix'
-        generate_release_notes: true
+      - name: Get version from package.json
+        id: version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+            echo "Tag v${{ env.VERSION }} already exists."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Tag v${{ env.VERSION }} does not exist."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "v${{ env.VERSION }}" -m "Release v${{ env.VERSION }}"
+          git push origin "v${{ env.VERSION }}"
+
+      - name: Build and Package VSIX
+        if: steps.check_tag.outputs.exists == 'false' || github.event_name == 'workflow_dispatch'
+        run: npx @vscode/vsce package --no-yarn
+
+      - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "v${{ env.VERSION }}"
+          files: '*.vsix'
+          generate_release_notes: true
