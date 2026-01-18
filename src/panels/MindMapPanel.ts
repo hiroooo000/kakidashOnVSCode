@@ -43,14 +43,22 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
             }
         });
 
+        // Listen for configuration changes
+        const changeConfigurationSubscription = vscode.workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration('kakidash.nodeWidth')) {
+                this.updateSettings(webviewPanel.webview);
+            }
+        });
+
         webviewPanel.onDidDispose(() => {
             changeDocumentSubscription.dispose();
+            changeConfigurationSubscription.dispose();
         });
 
         webviewPanel.webview.onDidReceiveMessage(async e => {
             switch (e.type) {
                 case 'client:ready':
-                    this.updateWebview(webviewPanel.webview, document.getText());
+                    this.updateSettings(webviewPanel.webview);
                     return;
                 case 'change':
                     isFromWebview = true;
@@ -108,6 +116,15 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                 </script>
             </body>
         `;
+    }
+
+    private updateSettings(webview: vscode.Webview) {
+        const config = vscode.workspace.getConfiguration('kakidash');
+        const nodeWidth = config.get<number>('nodeWidth', 300);
+        webview.postMessage({
+            type: 'settings',
+            nodeWidth: nodeWidth
+        });
     }
 
     private updateWebview(webview: vscode.Webview, text: string) {

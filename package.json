@@ -33,7 +33,17 @@
           }
         ]
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Kakidash",
+      "properties": {
+        "kakidash.nodeWidth": {
+          "type": "number",
+          "default": 300,
+          "description": "Maximum width of nodes in pixels. Set to -1 for unlimited width."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
