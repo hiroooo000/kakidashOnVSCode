@@ -43,7 +43,7 @@ describe('MindMapApp', () => {
 
     test('should initialize Kakidash with container', () => {
         app = new MindMapApp(container);
-        expect(Kakidash).toHaveBeenCalledWith(container);
+        expect(Kakidash).toHaveBeenCalledWith(container, {});
     });
 
     test('should load valid data wrapped in nodeData', () => {
@@ -98,7 +98,7 @@ describe('MindMapApp', () => {
 
     test('should call onChange when model:change event fires', () => {
         const onChange = jest.fn();
-        app = new MindMapApp(container, onChange);
+        app = new MindMapApp(container, {}, onChange);
         const board = app.getBoard();
 
         expect(board?.on).toHaveBeenCalledWith('model:change', expect.any(Function));
@@ -116,7 +116,7 @@ describe('MindMapApp', () => {
     // This test relies on the mock implementation of loadData triggering the event
     test('should NOT call onChange during loadData due to isSyncing', () => {
         const onChange = jest.fn();
-        app = new MindMapApp(container, onChange);
+        app = new MindMapApp(container, {}, onChange);
 
         // Verify loadData trigger event inside mock
         app.loadData('{}');
