@@ -59,6 +59,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
             switch (e.type) {
                 case 'client:ready':
                     this.updateSettings(webviewPanel.webview);
+                    this.updateWebview(webviewPanel.webview, document.getText());
                     return;
                 case 'change':
                     isFromWebview = true;
