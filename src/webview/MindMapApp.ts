@@ -1,15 +1,15 @@
-import { Kakidash, MindMapData } from 'kakidash';
+import { Kakidash, MindMapData, KakidashOptions } from 'kakidash';
 
 export class MindMapApp {
     private board: Kakidash | undefined;
     private isSyncing = false;
     private selectedNodeId: string | null = null;
 
-    constructor(private container: HTMLElement, private onChange?: (text: string) => void) {
+    constructor(private container: HTMLElement, options: KakidashOptions = {}, private onChange?: (text: string) => void) {
         if (!container) {
             throw new Error('Container element not found');
         }
-        this.board = new Kakidash(container);
+        this.board = new Kakidash(container, options);
 
         if (this.onChange) {
             this.board.on('model:change', () => {
@@ -49,6 +49,18 @@ export class MindMapApp {
                 }
             }
         });
+    }
+
+    public updateOptions(options: KakidashOptions): void {
+        if (!this.board) {
+            return;
+        }
+        if (options.maxNodeWidth !== undefined) {
+            this.board.setMaxNodeWidth(options.maxNodeWidth);
+        }
+        if (options.customStyles) {
+            this.board.updateGlobalStyles(options.customStyles);
+        }
     }
 
     /**

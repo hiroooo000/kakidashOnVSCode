@@ -45,7 +45,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
         // Listen for configuration changes
         const changeConfigurationSubscription = vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('kakidash.nodeWidth')) {
+            if (e.affectsConfiguration('kakidash.nodeWidth') || e.affectsConfiguration('kakidash.customStyles')) {
                 this.updateSettings(webviewPanel.webview);
             }
         });
@@ -93,6 +93,11 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
         // Initial content
         const textStr = document.getText();
 
+        // Get initial settings
+        const config = vscode.workspace.getConfiguration('kakidash');
+        const nodeWidth = config.get<number>('nodeWidth', 300);
+        const customStyles = config.get<object>('customStyles', {});
+
         // Use a nonce to whitelist which scripts can be run
         const nonce = getNonce();
 
@@ -110,6 +115,12 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
             </head>
             <body>
                 <div id="mindmap-container" tabindex="-1"></div>
+                <script nonce="${nonce}">
+                    window.KAKIDASH_OPTIONS = {
+                        maxNodeWidth: ${nodeWidth},
+                        customStyles: ${JSON.stringify(customStyles)}
+                    };
+                </script>
                 <script nonce="${nonce}" src="${scriptUri}"></script>
                 <script nonce="${nonce}">
                     // Initialize with data
@@ -122,9 +133,12 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
     private updateSettings(webview: vscode.Webview) {
         const config = vscode.workspace.getConfiguration('kakidash');
         const nodeWidth = config.get<number>('nodeWidth', 300);
+        const customStyles = config.get<object>('customStyles', {});
+
         webview.postMessage({
             type: 'settings',
-            nodeWidth: nodeWidth
+            nodeWidth: nodeWidth,
+            customStyles: customStyles
         });
     }
 

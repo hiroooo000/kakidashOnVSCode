@@ -1,4 +1,5 @@
 import { MindMapApp } from './MindMapApp';
+import { KakidashOptions } from 'kakidash';
 
 // VSCode API definition
 declare function acquireVsCodeApi(): {
@@ -7,11 +8,18 @@ declare function acquireVsCodeApi(): {
     setState(state: any): void;
 };
 
+declare global {
+    interface Window {
+        KAKIDASH_OPTIONS: KakidashOptions;
+    }
+}
+
 const vscode = acquireVsCodeApi();
 const container = document.getElementById('mindmap-container');
 
 if (container) {
-    const app = new MindMapApp(container, (text: string) => {
+    const options = window.KAKIDASH_OPTIONS || {};
+    const app = new MindMapApp(container, options, (text: string) => {
         vscode.postMessage({
             type: 'change',
             text: text
@@ -26,9 +34,10 @@ if (container) {
                 app.loadData(message.text);
                 return;
             case 'settings':
-                if (message.nodeWidth !== undefined) {
-                    app.setNodeWidth(message.nodeWidth);
-                }
+                app.updateOptions({
+                    maxNodeWidth: message.nodeWidth,
+                    customStyles: message.customStyles
+                });
                 return;
         }
     });
