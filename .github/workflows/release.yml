@@ -26,16 +26,30 @@ jobs:
         with:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
-          cache: 'npm'
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          run_install: false
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install
 
       - name: Run Check
-        run: |
-          npm run lint
-          npm run compile
-          npm run test
+        run: pnpm turbo run build lint test
 
       - name: Get version from package.json
         id: version

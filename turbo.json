@@ -1,0 +1,30 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "tasks": {
+        "build": {
+            "outputs": [
+                "dist/**"
+            ]
+        },
+        "test": {
+            "dependsOn": [],
+            "inputs": [
+                "src/**/*.ts",
+                "test/**/*.ts"
+            ],
+            "outputs": []
+        },
+        "lint": {
+            "dependsOn": [],
+            "outputs": []
+        },
+        "package": {
+            "dependsOn": [
+                "build"
+            ],
+            "outputs": [
+                "*.vsix"
+            ]
+        }
+    }
+}

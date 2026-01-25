@@ -45,3 +45,26 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 | `+` | Increase font size |
 | `-` | Decrease font size |
 | `1` - `7` | Change node color (Palette order) |
+
+## Development
+
+This project uses [pnpm](https://pnpm.io/) and [Turbo](https://turbo.build/).
+
+### Setup
+
+```bash
+npm install -g pnpm
+pnpm install
+```
+
+### Build & Test
+
+```bash
+pnpm turbo run build test lint
+```
+
+### Package
+
+```bash
+pnpm turbo run package
+```
