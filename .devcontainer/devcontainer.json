@@ -1,5 +1,11 @@
 {
     "name": "Node",
     "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y chromium xvfb"
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/node:1": {
+            "pnpm": "latest"
+        }
+    },
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y chromium xvfb && [ -f package.json ] && pnpm install"
 }
