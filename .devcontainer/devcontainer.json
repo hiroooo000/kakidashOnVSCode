@@ -2,10 +2,38 @@
     "name": "Node",
     "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
     "features": {
-        "ghcr.io/devcontainers/features/github-cli:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {
+            "version": "latest"
+        },
         "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts",
             "pnpm": "latest"
+        },
+        "ghcr.io/devcontainers/features/python:1": {
+            "version": "3.12",
+            "installTools": true,
+            "installJupyter": false
         }
     },
-    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y chromium xvfb && [ -f package.json ] && pnpm install"
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "mhutchie.git-graph"
+            ],
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.eslint": "explicit"
+                }
+            }
+        }
+    },
+    "containerEnv": {
+        "TZ": "Asia/Tokyo"
+    },
+    "remoteUser": "node",
+    "privileged": true,
+    "postCreateCommand": "pip install requests python-dotenv && sudo apt-get update && sudo apt-get install -y chromium xvfb && [ -f package.json ] && pnpm install --frozen-lockfile"
 }
