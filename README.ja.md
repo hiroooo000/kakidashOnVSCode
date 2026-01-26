@@ -45,3 +45,26 @@
 | `+` | フォントサイズ拡大 |
 | `-` | フォントサイズ縮小 |
 | `1` - `7` | ノードの色を変更 (パレット順) |
+
+## 開発
+
+このプロジェクトでは [pnpm](https://pnpm.io/) と [Turbo](https://turbo.build/) を使用しています。
+
+### セットアップ
+
+```bash
+npm install -g pnpm
+pnpm install
+```
+
+### ビルドとテスト
+
+```bash
+pnpm turbo run build test lint
+```
+
+### パッケージング
+
+```bash
+pnpm turbo run package
+```
