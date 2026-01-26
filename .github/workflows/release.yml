@@ -78,7 +78,7 @@ jobs:
 
       - name: Build and Package VSIX
         if: steps.check_tag.outputs.exists == 'false' || github.event_name == 'workflow_dispatch'
-        run: npx @vscode/vsce package --no-yarn
+        run: npx @vscode/vsce package --no-yarn --no-dependencies
 
       - name: Create Release
         if: steps.check_tag.outputs.exists == 'false' || github.event_name == 'workflow_dispatch'
