@@ -7,6 +7,12 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 - View and edit `.mm` and `.mindmap` files.
 - Keyboard driven mindmap editing.
 - Image support.
++
++## Architecture
++
++Details of the software architecture can be found here:
++- [English](docs/architecture.md)
++- [Japanese](docs/architecture_ja.md)
 
 ## Shortcuts
 
