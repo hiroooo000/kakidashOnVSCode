@@ -43,27 +43,87 @@
           "default": 300,
           "description": "Maximum width of nodes in pixels. Set to -1 for unlimited width."
         },
-        "kakidash.customStyles": {
-          "type": "object",
-          "default": {
-            "rootNode": {
-              "border": "4px solid gold",
-              "background": "#ffeeee",
-              "color": "#333"
-            },
-            "childNode": {
-              "border": "2px dashed blue",
-              "background": "white",
-              "color": "#555"
-            },
-            "connection": {
-              "color": "orange"
-            },
-            "canvas": {
-              "background": "#fafafa"
-            }
-          },
-          "description": "Custom styles for the mindmap nodes and connections."
+        "kakidash.style.canvas.background": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#fafafa",
+          "description": "Background color of the canvas."
+        },
+        "kakidash.style.rootNode.background": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#ffeeee",
+          "description": "Background color of the root node."
+        },
+        "kakidash.style.rootNode.color": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#333333",
+          "description": "Text color of the root node."
+        },
+        "kakidash.style.rootNode.borderStyle": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted",
+            "double",
+            "none"
+          ],
+          "default": "solid",
+          "description": "Border style of the root node."
+        },
+        "kakidash.style.rootNode.borderWidth": {
+          "type": "number",
+          "default": 4,
+          "description": "Border width of the root node (px)."
+        },
+        "kakidash.style.rootNode.borderColor": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#FFD700",
+          "description": "Border color of the root node."
+        },
+        "kakidash.style.childNode.background": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#ffffff",
+          "description": "Background color of the child nodes."
+        },
+        "kakidash.style.childNode.color": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#555555",
+          "description": "Text color of the child nodes."
+        },
+        "kakidash.style.childNode.borderStyle": {
+          "type": "string",
+          "enum": [
+            "solid",
+            "dashed",
+            "dotted",
+            "double",
+            "none"
+          ],
+          "default": "dashed",
+          "description": "Border style of the child nodes."
+        },
+        "kakidash.style.childNode.borderWidth": {
+          "type": "number",
+          "default": 2,
+          "description": "Border width of the child nodes (px)."
+        },
+        "kakidash.style.childNode.borderColor": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#0000FF",
+          "description": "Border color of the child nodes."
+        },
+        "kakidash.style.connection.color": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#FFA500",
+          "description": "Color of the connections."
         }
       }
     }
