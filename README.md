@@ -52,6 +52,15 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 | `-` | Decrease font size |
 | `1` - `7` | Change node color (Palette order) |
 
+## Configuration
+
+You can customize the appearance of the mindmap via VS Code settings (`Ctrl+,` and search for "kakidash").
+
+- **Canvas Background**: `kakidash.style.canvas.background`
+- **Root Node**: Customize background, text color, border style, width, and color.
+- **Child Node**: Customize background, text color, border style, width, and color.
+- **Connection**: Customize connection color.
+
 ## Development
 
 This project uses [pnpm](https://pnpm.io/) and [Turbo](https://turbo.build/).

@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { getNonce } from './getNonce';
+import { getKakidashStyles } from '../Configuration';
 
 export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
@@ -45,7 +46,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
         // Listen for configuration changes
         const changeConfigurationSubscription = vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('kakidash.nodeWidth') || e.affectsConfiguration('kakidash.customStyles')) {
+            if (e.affectsConfiguration('kakidash.nodeWidth') || e.affectsConfiguration('kakidash.style')) {
                 this.updateSettings(webviewPanel.webview);
             }
         });
@@ -96,7 +97,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
         // Get initial settings
         const config = vscode.workspace.getConfiguration('kakidash');
         const nodeWidth = config.get<number>('nodeWidth', 300);
-        const customStyles = config.get<object>('customStyles', {});
+        const customStyles = getKakidashStyles(config);
 
         // Use a nonce to whitelist which scripts can be run
         const nonce = getNonce();
@@ -133,7 +134,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
     private updateSettings(webview: vscode.Webview) {
         const config = vscode.workspace.getConfiguration('kakidash');
         const nodeWidth = config.get<number>('nodeWidth', 300);
-        const customStyles = config.get<object>('customStyles', {});
+        const customStyles = getKakidashStyles(config);
 
         webview.postMessage({
             type: 'settings',
