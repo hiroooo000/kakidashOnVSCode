@@ -63,23 +63,22 @@ VS Codeの設定 (`Ctrl+,`) からマインドマップの見た目をカスタ�
 
 ## 開発
 
-このプロジェクトでは [pnpm](https://pnpm.io/) と [Turbo](https://turbo.build/) を使用しています。
+このプロジェクトでは [npm](https://www.npmjs.com/) と [Turbo](https://turbo.build/) を使用しています。
 
 ### セットアップ
 
 ```bash
-npm install -g pnpm
-pnpm install
+npm install
 ```
 
 ### ビルドとテスト
 
 ```bash
-pnpm turbo run build test lint
+npm run turbo:ci
 ```
 
 ### パッケージング
 
 ```bash
-pnpm turbo run package
+npm run turbo:package
 ```
