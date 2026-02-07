@@ -87,3 +87,7 @@ jobs:
           tag_name: "v${{ env.VERSION }}"
           files: '*.vsix'
           generate_release_notes: true
+
+      - name: Publish to Visual Studio Marketplace
+        if: steps.check_tag.outputs.exists == 'false' || github.event_name == 'workflow_dispatch'
+        run: npx @vscode/vsce publish --pat ${{ secrets.VSCE_PAT }} --packagePath *.vsix --no-dependencies

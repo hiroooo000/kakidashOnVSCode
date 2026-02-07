@@ -63,23 +63,22 @@ You can customize the appearance of the mindmap via VS Code settings (`Ctrl+,` a
 
 ## Development
 
-This project uses [pnpm](https://pnpm.io/) and [Turbo](https://turbo.build/).
+This project uses [npm](https://www.npmjs.com/) and [Turbo](https://turbo.build/).
 
 ### Setup
 
 ```bash
-npm install -g pnpm
-pnpm install
+npm install
 ```
 
 ### Build & Test
 
 ```bash
-pnpm turbo run build test lint
+npm run turbo:ci
 ```
 
 ### Package
 
 ```bash
-pnpm turbo run package
+npm run turbo:package
 ```

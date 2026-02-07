@@ -170,6 +170,6 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
-    "kakidash": "0.1.13"
+    "kakidash": "0.2.0"
   }
 }
