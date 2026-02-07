@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.0.7] - 2026-02-07
+
+### Changed
+- Update kakidash to 0.2.0
+- Add publish step to release workflow
+
 ## [0.0.6] - 2026-02-05
 
 ### Changed
