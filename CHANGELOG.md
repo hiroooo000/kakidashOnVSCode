@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.0.8] - 2026-02-12
+
+### Changed
+- Update kakidash to 0.2.1
+
 ## [0.0.7] - 2026-02-07
 
 ### Changed
