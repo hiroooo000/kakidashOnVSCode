@@ -24,7 +24,7 @@ if (container) {
             type: 'change',
             text: text
         });
-    });
+    }, vscode);
 
     // Handle messages from the extension
     window.addEventListener('message', event => {

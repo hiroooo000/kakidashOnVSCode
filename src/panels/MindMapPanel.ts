@@ -70,6 +70,12 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                         isFromWebview = false;
                     }
                     return;
+                case 'request-import':
+                    await this.handleImportRequest(webviewPanel.webview, e.requestId, e.format);
+                    return;
+                case 'request-export':
+                    await this.handleExportRequest(e.data, e.filename, e.format);
+                    return;
             }
         });
     }
@@ -148,5 +154,110 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
             type: 'update',
             text: text,
         });
+    }
+
+    /**
+     * Handle import request from webview
+     */
+    private async handleImportRequest(
+        webview: vscode.Webview,
+        requestId: string,
+        format: string
+    ): Promise<void> {
+        try {
+            // Determine file filter based on format
+            const filters: { [name: string]: string[] } = {};
+            if (format === 'xmind') {
+                filters['XMind Files'] = ['xmind'];
+            }
+
+            // Show file picker
+            const fileUris = await vscode.window.showOpenDialog({
+                canSelectMany: false,
+                filters
+            });
+
+            if (!fileUris || fileUris.length === 0) {
+                // User cancelled
+                webview.postMessage({
+                    type: 'import-response',
+                    requestId,
+                    data: null
+                });
+                return;
+            }
+
+            // Read file content
+            const fileData = await vscode.workspace.fs.readFile(fileUris[0]);
+
+            // Send response to webview
+            webview.postMessage({
+                type: 'import-response',
+                requestId,
+                data: fileData.buffer
+            });
+        } catch (error) {
+            console.error('Error handling import request:', error);
+            webview.postMessage({
+                type: 'import-response',
+                requestId,
+                data: null
+            });
+        }
+    }
+
+    /**
+     * Handle export request from webview
+     */
+    private async handleExportRequest(
+        data: ArrayBuffer | string,
+        filename: string,
+        format: string
+    ): Promise<void> {
+        try {
+            // Determine file filter and extension based on format
+            const filters: { [name: string]: string[] } = {};
+            let extension = format;
+
+            if (format === 'png') {
+                filters['PNG Files'] = ['png'];
+            } else if (format === 'svg') {
+                filters['SVG Files'] = ['svg'];
+            } else if (format === 'markdown') {
+                filters['Markdown Files'] = ['md'];
+                extension = 'md';
+            }
+
+            // Create default URI with correct extension
+            const defaultUri = vscode.Uri.file(filename);
+
+            // Show save dialog
+            const saveUri = await vscode.window.showSaveDialog({
+                defaultUri,
+                filters
+            });
+
+            if (!saveUri) {
+                // User cancelled
+                return;
+            }
+
+            // Convert data to Uint8Array
+            let uint8Array: Uint8Array;
+            if (typeof data === 'string') {
+                // Convert string to Uint8Array
+                const encoder = new TextEncoder();
+                uint8Array = encoder.encode(data);
+            } else {
+                // Convert ArrayBuffer to Uint8Array
+                uint8Array = new Uint8Array(data);
+            }
+
+            // Write file
+            await vscode.workspace.fs.writeFile(saveUri, uint8Array);
+        } catch (error) {
+            console.error('Error handling export request:', error);
+            vscode.window.showErrorMessage(`Failed to export file: ${error}`);
+        }
     }
 }

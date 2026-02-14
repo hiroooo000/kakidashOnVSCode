@@ -125,4 +125,141 @@ describe('MindMapApp', () => {
         // We expect it NOT to be called because isSyncing should be true.
         expect(onChange).not.toHaveBeenCalled();
     });
+
+    describe('FileHandler', () => {
+        let mockVscode: any;
+
+        beforeEach(() => {
+            // Mock VSCode API
+            mockVscode = {
+                postMessage: jest.fn()
+            };
+        });
+
+        test('should pass fileHandler to Kakidash options', () => {
+            app = new MindMapApp(container, {}, undefined, mockVscode);
+
+            expect(Kakidash).toHaveBeenCalledWith(
+                container,
+                expect.objectContaining({
+                    fileHandler: expect.objectContaining({
+                        onImportFile: expect.any(Function),
+                        onExportFile: expect.any(Function)
+                    })
+                })
+            );
+        });
+
+        test('onImportFile should send request-import message and return ArrayBuffer', async () => {
+            app = new MindMapApp(container, {}, undefined, mockVscode);
+
+            // Get the fileHandler from Kakidash constructor call
+            const kakidashCall = (Kakidash as jest.Mock).mock.calls[0];
+            const options = kakidashCall[1];
+            const fileHandler = options.fileHandler;
+
+            // Simulate response from extension
+            const testData = new ArrayBuffer(8);
+
+            // Call onImportFile
+            const resultPromise = fileHandler.onImportFile('xmind');
+
+            // Get the actual requestId from the postMessage call
+            expect(mockVscode.postMessage).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: 'request-import',
+                    format: 'xmind'
+                })
+            );
+            const requestId = mockVscode.postMessage.mock.calls[mockVscode.postMessage.mock.calls.length - 1][0].requestId;
+
+            // Send response with the actual requestId
+            setTimeout(() => {
+                window.dispatchEvent(new MessageEvent('message', {
+                    data: {
+                        type: 'import-response',
+                        requestId,
+                        data: testData
+                    }
+                }));
+            }, 10);
+
+            const result = await resultPromise;
+            expect(result).toBe(testData);
+        });
+
+        test('onImportFile should return null when cancelled', async () => {
+            app = new MindMapApp(container, {}, undefined, mockVscode);
+
+            const kakidashCall = (Kakidash as jest.Mock).mock.calls[0];
+            const options = kakidashCall[1];
+            const fileHandler = options.fileHandler;
+
+            // Call onImportFile
+            const resultPromise = fileHandler.onImportFile('xmind');
+
+            // Get the actual requestId from the postMessage call
+            const requestId = mockVscode.postMessage.mock.calls[mockVscode.postMessage.mock.calls.length - 1][0].requestId;
+
+            // Simulate cancellation from extension
+            setTimeout(() => {
+                window.dispatchEvent(new MessageEvent('message', {
+                    data: {
+                        type: 'import-response',
+                        requestId,
+                        data: null
+                    }
+                }));
+            }, 10);
+
+            const result = await resultPromise;
+            expect(result).toBeNull();
+        });
+
+        test('onExportFile should send request-export message with string data', async () => {
+            app = new MindMapApp(container, {}, undefined, mockVscode);
+
+            const kakidashCall = (Kakidash as jest.Mock).mock.calls[0];
+            const options = kakidashCall[1];
+            const fileHandler = options.fileHandler;
+
+            const testData = '# Test Markdown';
+            await fileHandler.onExportFile(testData, 'test.md', 'markdown');
+
+            expect(mockVscode.postMessage).toHaveBeenCalledWith({
+                type: 'request-export',
+                data: testData,
+                filename: 'test.md',
+                format: 'markdown'
+            });
+        });
+
+        test('onExportFile should convert Blob to ArrayBuffer before sending', async () => {
+            app = new MindMapApp(container, {}, undefined, mockVscode);
+
+            const kakidashCall = (Kakidash as jest.Mock).mock.calls[0];
+            const options = kakidashCall[1];
+            const fileHandler = options.fileHandler;
+
+            const mockArrayBuffer = new ArrayBuffer(9);
+            const testBlob = new Blob(['test data'], { type: 'image/png' });
+
+            // Mock Blob.prototype.arrayBuffer
+            const originalArrayBuffer = Blob.prototype.arrayBuffer;
+            Blob.prototype.arrayBuffer = jest.fn().mockResolvedValue(mockArrayBuffer);
+
+            await fileHandler.onExportFile(testBlob, 'test.png', 'png');
+
+            expect(Blob.prototype.arrayBuffer).toHaveBeenCalled();
+            expect(mockVscode.postMessage).toHaveBeenCalledWith({
+                type: 'request-export',
+                data: mockArrayBuffer,
+                filename: 'test.png',
+                format: 'png'
+            });
+
+            // Restore original method
+            Blob.prototype.arrayBuffer = originalArrayBuffer;
+        });
+    });
 });
