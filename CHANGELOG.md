@@ -1,6 +1,9 @@
 # Changelog
 
-## [0.0.9] - 2026-02-14
+## [0.0.9] - 2026-02-15
+
+### Added
+- Use document filename as default export filename
 
 ### Changed
 - Update kakidash to 0.2.2
