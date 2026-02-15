@@ -1,5 +1,10 @@
 import { Kakidash, MindMapData, KakidashOptions, FileHandler } from 'kakidash';
 
+// Mock window.confirm for VSCode Webview restrictions
+// kakidash library uses window.confirm in importXMind method,
+// so override it to always return true
+(window as any).confirm = () => true;
+
 // VSCode API type
 interface VSCodeAPI {
     postMessage(message: any): void;
