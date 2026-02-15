@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { getNonce } from './getNonce';
 import { getKakidashStyles } from '../Configuration';
+import * as path from 'path';
 
 export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
@@ -74,7 +75,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                     await this.handleImportRequest(webviewPanel.webview, e.requestId, e.format);
                     return;
                 case 'request-export':
-                    await this.handleExportRequest(e.data, e.filename, e.format);
+                    await this.handleExportRequest(e.data, document, e.format);
                     return;
             }
         });
@@ -211,7 +212,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
      */
     private async handleExportRequest(
         data: ArrayBuffer | string,
-        filename: string,
+        document: vscode.TextDocument,
         format: string
     ): Promise<void> {
         try {
@@ -229,7 +230,9 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
             }
 
             // Create default URI with correct extension
-            const defaultUri = vscode.Uri.file(filename);
+            const dir = path.dirname(document.fileName);
+            const name = path.basename(document.fileName, path.extname(document.fileName));
+            const defaultUri = vscode.Uri.file(path.join(dir, `${name}.${extension}`));
 
             // Show save dialog
             const saveUri = await vscode.window.showSaveDialog({
