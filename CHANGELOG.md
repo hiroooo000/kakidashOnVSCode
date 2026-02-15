@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.0.9] - 2026-02-14
+
+### Changed
+- Update kakidash to 0.2.2
+
+### Added
+- Implement file import/export functionality using kakidash 0.2.2 FileHandler interface
+- Add support for XMind file import
+- Add support for PNG, SVG, and Markdown export
+
+## [0.0.8] - 2026-02-12
+
+### Changed
+- Update kakidash to 0.2.1
+
 ## [0.0.7] - 2026-02-07
 
 ### Changed
