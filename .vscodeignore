@@ -10,8 +10,9 @@ turbo.json
 .github/**
 .agent/**
 .devcontainer/**
-.turbo/**
-.pnpm-store/**
+.turbo
+.pnpm-store
+pnpm-lock.yaml
 node_modules/**
 out/**
 **/*.map
