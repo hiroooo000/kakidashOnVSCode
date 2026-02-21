@@ -41,25 +41,29 @@
         "kakidash.nodeWidth": {
           "type": "number",
           "default": 300,
-          "description": "Maximum width of nodes in pixels. Set to -1 for unlimited width."
+          "description": "Maximum width of nodes in pixels. Set to -1 for unlimited width.",
+          "order": 1
         },
         "kakidash.style.canvas.background": {
           "type": "string",
           "format": "color-hex",
           "default": "#fafafa",
-          "description": "Background color of the canvas."
-        },
-        "kakidash.style.rootNode.background": {
-          "type": "string",
-          "format": "color-hex",
-          "default": "#ffeeee",
-          "description": "Background color of the root node."
+          "description": "Background color of the canvas.",
+          "order": 10
         },
         "kakidash.style.rootNode.color": {
           "type": "string",
           "format": "color-hex",
           "default": "#333333",
-          "description": "Text color of the root node."
+          "description": "Text color of the root node.",
+          "order": 20
+        },
+        "kakidash.style.rootNode.background": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#ffeeee",
+          "description": "Background color of the root node.",
+          "order": 21
         },
         "kakidash.style.rootNode.borderStyle": {
           "type": "string",
@@ -71,30 +75,35 @@
             "none"
           ],
           "default": "solid",
-          "description": "Border style of the root node."
+          "description": "Border style of the root node.",
+          "order": 22
         },
         "kakidash.style.rootNode.borderWidth": {
           "type": "number",
           "default": 4,
-          "description": "Border width of the root node (px)."
+          "description": "Border width of the root node (px).",
+          "order": 23
         },
         "kakidash.style.rootNode.borderColor": {
           "type": "string",
           "format": "color-hex",
           "default": "#FFD700",
-          "description": "Border color of the root node."
-        },
-        "kakidash.style.childNode.background": {
-          "type": "string",
-          "format": "color-hex",
-          "default": "#ffffff",
-          "description": "Background color of the child nodes."
+          "description": "Border color of the root node.",
+          "order": 24
         },
         "kakidash.style.childNode.color": {
           "type": "string",
           "format": "color-hex",
           "default": "#555555",
-          "description": "Text color of the child nodes."
+          "description": "Text color of the child nodes.",
+          "order": 30
+        },
+        "kakidash.style.childNode.background": {
+          "type": "string",
+          "format": "color-hex",
+          "default": "#ffffff",
+          "description": "Background color of the child nodes.",
+          "order": 31
         },
         "kakidash.style.childNode.borderStyle": {
           "type": "string",
@@ -106,24 +115,28 @@
             "none"
           ],
           "default": "dashed",
-          "description": "Border style of the child nodes."
+          "description": "Border style of the child nodes.",
+          "order": 32
         },
         "kakidash.style.childNode.borderWidth": {
           "type": "number",
           "default": 2,
-          "description": "Border width of the child nodes (px)."
+          "description": "Border width of the child nodes (px).",
+          "order": 33
         },
         "kakidash.style.childNode.borderColor": {
           "type": "string",
           "format": "color-hex",
           "default": "#0000FF",
-          "description": "Border color of the child nodes."
+          "description": "Border color of the child nodes.",
+          "order": 34
         },
         "kakidash.style.connection.color": {
           "type": "string",
           "format": "color-hex",
           "default": "#FFA500",
-          "description": "Color of the connections."
+          "description": "Color of the connections.",
+          "order": 40
         }
       }
     }
