@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.0.11] - 2026-03-17
+
+### Added
+- Added strikethrough shortcut `s`
+
+### Changed
+- Update kakidash to 0.3.2
+  - Support strikethrough text style
+  - Migrate to pointer events for touch support
+  - Improve drag sensitivity with distance-based threshold
+  - Fix clipboard paste issues and markdown export dialog
+  - Significant architectural refactoring (InteractionOrchestrator, CommandBus, etc.)
+
 ## [0.0.10] - 2026-02-22
 
 ### Changed
