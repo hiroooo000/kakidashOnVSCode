@@ -48,6 +48,7 @@ Mindmap viewer and editor using [kakidash](https://github.com/hiroooo000/kakidas
 | --- | --- |
 | `b` | Toggle Bold |
 | `i` | Toggle Italic |
+| `s` | Toggle Strikethrough |
 | `+` | Increase font size |
 | `-` | Decrease font size |
 | `1` - `7` | Change node color (Palette order) |
