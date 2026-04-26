@@ -19,19 +19,20 @@ const container = document.getElementById('mindmap-container');
 
 if (container) {
     const options = window.KAKIDASH_OPTIONS || {};
-    const app = new MindMapApp(container, options, (text: string) => {
+    const app = new MindMapApp(container, options, (text: string, images?: Record<string, string>) => {
         vscode.postMessage({
             type: 'change',
-            text: text
+            text: text,
+            images: images
         });
     }, vscode);
 
     // Handle messages from the extension
-    window.addEventListener('message', event => {
+    window.addEventListener('message', async event => {
         const message = event.data;
         switch (message.type) {
             case 'update':
-                app.loadData(message.text);
+                await app.loadData(message.text, message.images);
                 return;
             case 'settings':
                 app.updateOptions({

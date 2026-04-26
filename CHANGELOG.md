@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.4.0] - 2026-04-26
+
+### Added
+- Hybrid image storage support (original images are stored as separate files `.img_*.png`)
+- Thumbnail optimization (automatically reduce base64 image size for preview)
+- New Kakidash APIs: `getImages()`, `gcImages()`, `zoomNode()`
+
+### Changed
+- Update kakidash library to v0.4.0
+
+### Fixed
+- Prevented image corruption during file saving and synchronization
+
 ## [0.0.11] - 2026-03-17
 
 ### Added
