@@ -12,15 +12,16 @@ interface VSCodeAPI {
 
 export class MindMapApp {
     private board: Kakidash | undefined;
-    private isSyncing = false;
+    private isSyncing = true;
     private selectedNodeId: string | null = null;
     private vscode: VSCodeAPI | undefined;
     private pendingRequests: Map<string, (value: any) => void> = new Map();
+    private myMemoryImageMap: Record<string, string> = {};
 
     constructor(
         private container: HTMLElement,
         options: KakidashOptions = {},
-        private onChange?: (text: string) => void,
+        private onChange?: (text: string, images?: Record<string, string>) => void,
         vscode?: VSCodeAPI
     ) {
         if (!container) {
@@ -38,7 +39,9 @@ export class MindMapApp {
         // Initialize Kakidash with fileHandler option
         this.board = new Kakidash(container, {
             ...options,
-            fileHandler
+            fileHandler,
+            // @ts-ignore: getImage might be missing in older type definitions
+            getImage: (ref: string) => this.myMemoryImageMap[ref]
         });
 
         // Set up message listener for import responses
@@ -51,9 +54,13 @@ export class MindMapApp {
                 if (this.isSyncing) {
                     return;
                 }
+                // Perform garbage collection for images in memory before getting them for save
+                this.board?.gcImages();
+                
                 const data = this.board?.getData();
+                const images = this.board?.getImages();
                 if (data && this.onChange) {
-                    this.onChange(JSON.stringify(data, null, 2));
+                    this.onChange(JSON.stringify(data, null, 2), images);
                 }
             });
 
@@ -102,11 +109,14 @@ export class MindMapApp {
      * Parse and load data into the mindmap.
      * Handles empty or invalid JSON by loading a default root node.
      */
-    public loadData(text: string): void {
+    public async loadData(text: string, images?: Record<string, string>): Promise<void> {
+        this.isSyncing = true;
         if (!this.board) {
             return;
         }
-        this.isSyncing = true;
+        if (images) {
+            this.myMemoryImageMap = images;
+        }
         try {
             let parsed: any;
 
@@ -151,6 +161,36 @@ export class MindMapApp {
                 data = {
                     nodeData: parsed
                 };
+            }
+
+            if (images) {
+                this.myMemoryImageMap = images;
+                
+                // Explicitly sync images to the internal image store.
+                // In kakidash 0.3.2, the constructor's getImage callback may not be correctly used
+                // for zoomed views if the store is empty.
+                const anyBoard = this.board as any;
+                const store = anyBoard?.controller?.imageStore;
+                if (store && typeof store.addImage === 'function') {
+                    for (const [ref, data] of Object.entries(images)) {
+                        store.addImage(ref, data);
+                    }
+                }
+            }
+            
+            // Fix legacy thumbnails if needed
+            if (images) {
+                const changed = await this.ensureThumbnails(data.nodeData, images);
+                if (changed) {
+                    // Trigger a change after loadData finishes to save the new thumbnails
+                    setTimeout(() => {
+                        const updatedData = this.board?.getData();
+                        const updatedImages = this.board?.getImages();
+                        if (updatedData && this.onChange) {
+                            this.onChange(JSON.stringify(updatedData, null, 2), updatedImages);
+                        }
+                    }, 500);
+                }
             }
 
             this.board.loadData(data);
@@ -245,5 +285,58 @@ export class MindMapApp {
      */
     private generateRequestId(): string {
         return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    private async ensureThumbnails(node: any, images: Record<string, string>): Promise<boolean> {
+        let changed = false;
+
+        if (node._needsThumbnailFix && node.imageRef) {
+            try {
+                const original = images[node.imageRef];
+                if (original) {
+                    const thumbnail = await this.generateThumbnail(original);
+                    if (thumbnail) {
+                        node.thumbnail = thumbnail;
+                        delete node._needsThumbnailFix;
+                        changed = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to generate thumbnail:', e);
+            }
+        }
+
+        if (node.children && Array.isArray(node.children)) {
+            for (const child of node.children) {
+                if (await this.ensureThumbnails(child, images)) {
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    private generateThumbnail(dataUrl: string, maxWidth = 200): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ratio = Math.min(maxWidth / img.width, 1);
+                canvas.width = img.width * ratio;
+                canvas.height = img.height * ratio;
+                const ctx = canvas.getContext('2d');
+                if (!ctx) {
+                    reject(new Error('Failed to get 2D context'));
+                    return;
+                }
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // Use webp for better compression, fallback to jpeg if dataURL is png
+                const result = canvas.toDataURL('image/webp', 0.7);
+                resolve(result);
+            };
+            img.onerror = () => reject(new Error('Failed to load image for thumbnail'));
+            img.src = dataUrl;
+        });
     }
 }

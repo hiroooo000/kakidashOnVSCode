@@ -18,7 +18,9 @@ jest.mock('kakidash', () => {
                 on: jest.fn().mockImplementation((event, callback) => {
                     eventListeners[event] = callback;
                 }),
-                getData: jest.fn().mockReturnValue({ id: 'root', topic: 'Mock Data' })
+                getData: jest.fn().mockReturnValue({ id: 'root', topic: 'Mock Data' }),
+                getImages: jest.fn().mockReturnValue({ 'img1': 'data:image/png;base64,...' }),
+                gcImages: jest.fn()
             };
         })
     };
@@ -43,7 +45,9 @@ describe('MindMapApp', () => {
 
     test('should initialize Kakidash with container', () => {
         app = new MindMapApp(container);
-        expect(Kakidash).toHaveBeenCalledWith(container, {});
+        expect(Kakidash).toHaveBeenCalledWith(container, expect.objectContaining({
+            getImage: expect.any(Function)
+        }));
     });
 
     test('should load valid data wrapped in nodeData', () => {
@@ -103,14 +107,15 @@ describe('MindMapApp', () => {
 
         expect(board?.on).toHaveBeenCalledWith('model:change', expect.any(Function));
 
+        // Initial load to set isSyncing to false
+        app.loadData('{}');
+
         // Manually trigger the event listener
-        // We know from our mock that `on` stores the callback in `eventListeners` but we can't access it directly here easily 
-        // because it's inside the factory.
-        // BUT we can access the mock call arguments.
         const callback = (board?.on as jest.Mock).mock.calls[0][1];
         callback();
 
-        expect(onChange).toHaveBeenCalledWith(expect.stringContaining('Mock Data'));
+        expect(board?.getImages).toHaveBeenCalled();
+        expect(onChange).toHaveBeenCalledWith(expect.stringContaining('Mock Data'), expect.any(Object));
     });
 
     // This test relies on the mock implementation of loadData triggering the event
