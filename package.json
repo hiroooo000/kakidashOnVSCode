@@ -16,12 +16,9 @@
   ],
   "version": "0.4.0",
   "engines": {
-    "vscode": "^1.96.0"
+    "vscode": "^1.90.0"
   },
   "packageManager": "pnpm@10.26.0",
-  "activationEvents": [
-    "onCustomEditor:kakidash.mindmap"
-  ],
   "main": "./dist/extension.js",
   "contributes": {
     "customEditors": [

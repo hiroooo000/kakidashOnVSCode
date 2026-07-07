@@ -11,10 +11,10 @@ const extensionConfig = {
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         libraryTarget: 'commonjs',
-        clean: true,
+        clean: false,
         devtoolModuleFilenameTemplate: '../[resource-path]'
     },
-    devtool: 'nosources-source-map',
+    devtool: 'source-map',
     externals: {
         'vscode': 'commonjs vscode'
     },
@@ -47,7 +47,7 @@ const webviewConfig = {
         clean: false, // Don't clean, otherwise extension.js might be deleted
         devtoolModuleFilenameTemplate: '../[resource-path]'
     },
-    devtool: 'nosources-source-map',
+    devtool: 'source-map',
     resolve: {
         extensions: ['.ts', '.js']
     },

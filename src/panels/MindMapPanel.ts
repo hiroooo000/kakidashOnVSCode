@@ -135,6 +135,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                 <style>
                     body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: white; }
                     #mindmap-container { width: 100%; height: 100%; outline: none; }
+                    .mindmap-node { width: max-content; }
                 </style>
             </head>
             <body>
