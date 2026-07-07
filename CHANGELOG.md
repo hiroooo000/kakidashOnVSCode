@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1] - 2026-07-07
+
+### Fixed
+- Resolve image node compression issue
+- Fix node deletion focus loss
+- Resolve webpack race condition
+- Fix launch config and remove package-lock.json
+
 ## [0.4.0] - 2026-04-26
 
 ### Added
