@@ -14,6 +14,7 @@ export class MindMapApp {
     private board: Kakidash | undefined;
     private isSyncing = true;
     private selectedNodeId: string | null = null;
+    private lastSentText: string | null = null;
     private vscode: VSCodeAPI | undefined;
     private pendingRequests: Map<string, (value: any) => void> = new Map();
     private myMemoryImageMap: Record<string, string> = {};
@@ -60,13 +61,24 @@ export class MindMapApp {
                 const data = this.board?.getData();
                 const images = this.board?.getImages();
                 if (data && this.onChange) {
-                    this.onChange(JSON.stringify(data, null, 2), images);
+                    const text = JSON.stringify(data, null, 2);
+                    this.lastSentText = text;
+                    this.onChange(text, images);
                 }
             });
 
             // Track selection
             this.board.on('node:select', (id: string | null) => {
                 this.selectedNodeId = id;
+            });
+
+            // Re-focus container when a node is deleted to maintain keyboard navigation
+            this.board.on('node:remove', () => {
+                setTimeout(() => {
+                    if (document.activeElement === document.body || !this.container.contains(document.activeElement)) {
+                        this.container.focus();
+                    }
+                }, 10);
             });
         }
 
@@ -112,6 +124,10 @@ export class MindMapApp {
     public async loadData(text: string, images?: Record<string, string>): Promise<void> {
         this.isSyncing = true;
         if (!this.board) {
+            return;
+        }
+        if (text === this.lastSentText) {
+            this.isSyncing = false;
             return;
         }
         if (images) {
