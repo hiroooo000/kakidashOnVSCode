@@ -40,14 +40,16 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
 
         webviewPanel.webview.html = this.getHtmlForWebview(webviewPanel.webview, document);
 
-        let isFromWebview = false;
+        let lastKnownText = document.getText();
 
         // Listen for changes to the document (though we are focused on read-only for now or initial load)
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
             if (e.document.uri.toString() === document.uri.toString()) {
-                if (isFromWebview) {
+                const currentText = document.getText();
+                if (currentText === lastKnownText) {
                     return;
                 }
+                lastKnownText = currentText;
                 this.updateWebview(webviewPanel.webview, document);
             }
         });
@@ -82,7 +84,10 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                     await this.updateWebview(webviewPanel.webview, document);
                     return;
                 case 'change':
-                    await this.updateTextDocument(document, e.text);
+                    if (lastKnownText !== e.text) {
+                        lastKnownText = e.text;
+                        await this.updateTextDocument(document, e.text);
+                    }
                     if (e.images) {
                         await this.saveImages(document.uri, e.images);
                     }
@@ -133,9 +138,19 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>Kakidash Mindmap</title>
                 <style>
-                    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: white; }
+                    body { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: var(--vscode-editor-background, white); }
                     #mindmap-container { width: 100%; height: 100%; outline: none; }
                     .mindmap-node { width: max-content; }
+                    
+                    /* Improve visibility of the editing textarea in dark/high-contrast mode */
+                    body.vscode-dark textarea {
+                        color: var(--vscode-input-foreground, #ffffff) !important;
+                        background-color: var(--vscode-input-background, #333333) !important;
+                    }
+                    body.vscode-high-contrast textarea {
+                        color: var(--vscode-input-foreground, #ffffff) !important;
+                        background-color: var(--vscode-input-background, #000000) !important;
+                    }
                 </style>
             </head>
             <body>
