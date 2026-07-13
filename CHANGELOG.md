@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.2] - 2026-07-13
+
+### Fixed
+- Improve text color of node editor in dark mode
+
 ## [0.4.1] - 2026-07-07
 
 ### Fixed
