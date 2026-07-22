@@ -14,7 +14,7 @@
     "brainstorming",
     "idea"
   ],
-  "version": "0.4.2",
+  "version": "0.4.3",
   "engines": {
     "vscode": "^1.96.0"
   },
@@ -180,6 +180,6 @@
     "webpack-cli": "^5.1.1"
   },
   "dependencies": {
-    "kakidash": "0.4.0"
+    "kakidash": "0.4.1"
   }
 }
