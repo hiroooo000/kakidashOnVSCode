@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.4] - 2026-11-19
+
+### Fixed
+- Preserve focus when deleting a node
+
 ## [0.4.3] - 2026-07-22
 
 ### Changed
