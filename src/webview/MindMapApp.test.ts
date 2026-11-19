@@ -131,6 +131,74 @@ describe('MindMapApp', () => {
         expect(onChange).not.toHaveBeenCalled();
     });
 
+    test('should skip loadData when text only differs by CRLF vs LF from lastSentText', async () => {
+        const onChange = jest.fn();
+        app = new MindMapApp(container, {}, onChange);
+        const board = app.getBoard()!;
+
+        (board.getData as jest.Mock).mockReturnValue({
+            nodeData: { id: 'root', topic: 'Root', children: [] },
+            selectedId: 'root',
+            selectedIds: ['root']
+        });
+
+        await app.loadData('{}');
+        (board.loadData as jest.Mock).mockClear();
+
+        // Trigger model:change to populate lastSentText (LF)
+        const modelChangeCallback = (board.on as jest.Mock).mock.calls.find(
+            (call: any[]) => call[0] === 'model:change'
+        )[1];
+        modelChangeCallback();
+
+        const sentText = onChange.mock.calls[0][0] as string;
+        const crlfText = sentText.replace(/\n/g, '\r\n');
+
+        await app.loadData(crlfText);
+        expect(board.loadData).not.toHaveBeenCalled();
+    });
+
+    test('should sanitize deleted node IDs from selectedId/selectedIds on model:change', async () => {
+        const onChange = jest.fn();
+        app = new MindMapApp(container, {}, onChange);
+        const board = app.getBoard()!;
+
+        await app.loadData('{}');
+
+        (board.getData as jest.Mock).mockReturnValue({
+            nodeData: { id: 'root', topic: 'Root', children: [] },
+            selectedId: 'deleted-node',
+            selectedIds: ['deleted-node', 'root']
+        });
+
+        const modelChangeCallback = (board.on as jest.Mock).mock.calls.find(
+            (call: any[]) => call[0] === 'model:change'
+        )[1];
+        modelChangeCallback();
+
+        const sentData = JSON.parse(onChange.mock.calls[0][0]);
+        expect(sentData.selectedId).toBeUndefined();
+        expect(sentData.selectedIds).toEqual(['root']);
+    });
+
+    test('should sanitize non-existent selectedId/selectedIds in loadData', async () => {
+        app = new MindMapApp(container);
+        const board = app.getBoard()!;
+
+        const json = JSON.stringify({
+            nodeData: { id: 'root', topic: 'Root', children: [{ id: 'child-1', topic: 'Child', children: [] }] },
+            selectedId: 'deleted-node',
+            selectedIds: ['deleted-node', 'child-1']
+        });
+
+        await app.loadData(json);
+
+        expect(board.loadData).toHaveBeenCalledWith({
+            nodeData: { id: 'root', topic: 'Root', children: [{ id: 'child-1', topic: 'Child', children: [] }] },
+            selectedIds: ['child-1']
+        });
+    });
+
     describe('FileHandler', () => {
         let mockVscode: any;
 
