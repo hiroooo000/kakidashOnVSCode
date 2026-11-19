@@ -61,7 +61,8 @@ export class MindMapApp {
                 const data = this.board?.getData();
                 const images = this.board?.getImages();
                 if (data && this.onChange) {
-                    const text = JSON.stringify(data, null, 2);
+                    const sanitizedData = this.sanitizeSelection(data);
+                    const text = JSON.stringify(sanitizedData, null, 2);
                     this.lastSentText = text;
                     this.onChange(text, images);
                 }
@@ -126,7 +127,7 @@ export class MindMapApp {
         if (!this.board) {
             return;
         }
-        if (text === this.lastSentText) {
+        if (this.lastSentText !== null && this.normalizeLineEndings(text) === this.normalizeLineEndings(this.lastSentText)) {
             this.isSyncing = false;
             return;
         }
@@ -209,7 +210,7 @@ export class MindMapApp {
                 }
             }
 
-            this.board.loadData(data);
+            this.board.loadData(this.sanitizeSelection(data));
         } finally {
             this.isSyncing = false;
         }
@@ -331,6 +332,46 @@ export class MindMapApp {
         }
 
         return changed;
+    }
+
+    private normalizeLineEndings(text: string): string {
+        return text.replace(/\r\n/g, '\n');
+    }
+
+    /**
+     * Remove stale selectedId / selectedIds that no longer exist in nodeData.
+     * kakidash's removeNode emits model:change before selectNode(parentId),
+     * which can leave the deleted node ID in exported selection state.
+     */
+    private sanitizeSelection<T extends { nodeData?: any; selectedId?: string; selectedIds?: string[] }>(data: T): T {
+        if (!data || !data.nodeData) {
+            return data;
+        }
+        const validIds = new Set<string>();
+        this.collectNodeIds(data.nodeData, validIds);
+
+        const sanitized = { ...data };
+        if (sanitized.selectedId !== undefined && !validIds.has(sanitized.selectedId)) {
+            delete sanitized.selectedId;
+        }
+        if (Array.isArray(sanitized.selectedIds)) {
+            sanitized.selectedIds = sanitized.selectedIds.filter(id => validIds.has(id));
+        }
+        return sanitized;
+    }
+
+    private collectNodeIds(node: any, ids: Set<string>): void {
+        if (!node || typeof node !== 'object') {
+            return;
+        }
+        if (typeof node.id === 'string') {
+            ids.add(node.id);
+        }
+        if (Array.isArray(node.children)) {
+            for (const child of node.children) {
+                this.collectNodeIds(child, ids);
+            }
+        }
     }
 
     private generateThumbnail(dataUrl: string, maxWidth = 200): Promise<string> {

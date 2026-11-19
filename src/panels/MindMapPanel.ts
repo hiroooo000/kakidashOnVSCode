@@ -46,7 +46,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
         const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(e => {
             if (e.document.uri.toString() === document.uri.toString()) {
                 const currentText = document.getText();
-                if (currentText === lastKnownText) {
+                if (this.normalizeLineEndings(currentText) === this.normalizeLineEndings(lastKnownText)) {
                     return;
                 }
                 lastKnownText = currentText;
@@ -84,7 +84,7 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                     await this.updateWebview(webviewPanel.webview, document);
                     return;
                 case 'change':
-                    if (lastKnownText !== e.text) {
+                    if (this.normalizeLineEndings(lastKnownText) !== this.normalizeLineEndings(e.text)) {
                         lastKnownText = e.text;
                         await this.updateTextDocument(document, e.text);
                     }
@@ -100,6 +100,10 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
                     return;
             }
         });
+    }
+
+    private normalizeLineEndings(text: string): string {
+        return text.replace(/\r\n/g, '\n');
     }
 
     private updateTextDocument(document: vscode.TextDocument, text: string) {
@@ -118,9 +122,6 @@ export class MindMapPanel implements vscode.CustomTextEditorProvider {
         // Local path to main script run in the webview
         const scriptPathOnDisk = vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'webview.js');
         const scriptUri = webview.asWebviewUri(scriptPathOnDisk);
-
-        // Initial content
-        const textStr = document.getText();
 
         // Get initial settings
         const config = vscode.workspace.getConfiguration('kakidash');
